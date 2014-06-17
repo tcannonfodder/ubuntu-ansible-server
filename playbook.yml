@@ -1,9 +1,0 @@
----
-- hosts: webserver
-  vars:
-    http_port: 80
-  remote_user: root
-  tasks:
-  - name: Configure locale
-    command: /usr/sbin/update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
-    sudo: yes
