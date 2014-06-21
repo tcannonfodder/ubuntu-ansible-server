@@ -9,11 +9,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # options are documented and commented below. For a complete reference,
   # please see the online documentation at vagrantup.com.
 
-  config.vm.define "webserver" do |machine|
+  # config.ssh.forward_agent = true
+
+  config.vm.define "server" do |machine|
     # Every Vagrant virtual environment requires a box to build off of.
     machine.vm.box = "precise64"
     machine.vm.box_url = "http://files.vagrantup.com/precise64.box"
     machine.vm.network :public_network
+    machine.vm.network :forwarded_port, guest: 80, host: 8080
   end
 
   config.vm.provision "ansible" do |ansible|
@@ -21,8 +24,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       ansible.groups = {
         "webserver" => "webserver"
       }
+      ansible.host_key_checking = false
+      # ansible.verbose =  'vvvv'
       ansible.extra_vars = {
-        :ansible_ssh_user => 'vagrant'
+        :ansible_ssh_user => 'vagrant',
+        :ansible_connection => 'ssh',
+        :ansible_ssh_args => '-o ForwardAgent=yes'
       }
   end
 
