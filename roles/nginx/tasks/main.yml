@@ -1,0 +1,19 @@
+- name: install python-pycurl
+  apt: pkg=python-pycurl state=latest
+  sudo: yes
+
+- name: Add nginx stable repository
+  apt_repository: repo='ppa:nginx/stable'
+  sudo: yes
+
+- name: Add nginx repository key
+  apt_key: "url=http://keyserver.ubuntu.com:11371/pks/lookup?op=get&search=0x00A6F0A3C300EE8C state=present"
+  sudo: yes
+
+- name: Update apt cache
+  apt: update_cache=yes
+  sudo: yes
+
+- name: Install nginx
+  apt: pkg=nginx state=present
+  sudo: yes

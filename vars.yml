@@ -1,0 +1,2 @@
+# Change if you use a different public key to connect to github
+github_public_key_location: '~/.ssh/id_rsa.pub'

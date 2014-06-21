@@ -1,0 +1,76 @@
+---
+- name: Configure locale
+  command: /usr/sbin/update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+  sudo: yes
+- name: Update apt cache
+  apt:  update_cache=yes
+  sudo: yes
+
+# this is required for forwarding ssh keys when deploying
+- name: Allow current user to connect to deploy user via ssh
+  authorized_key: >
+    user=vagrant
+    key="{{ lookup('file', github_public_key_location) }}"
+  sudo: yes
+
+- name: Disable root SSH Access
+  action: >
+    lineinfile dest=/etc/ssh/sshd_config
+    regexp="^PermitRootLogin"
+    line="PermitRootLogin no" state=present
+  sudo: yes
+  register: disable_root_ssh_access
+- name: Disable Password Authentication
+  action: >
+    lineinfile dest=/etc/ssh/sshd_config
+    regexp="^PasswordAuthentication"
+    line="PasswordAuthentication no" state=present
+  sudo: yes
+  register: disable_password_authentication
+- name: restart SSH
+  sudo: yes
+  service: name=ssh state=restarted
+  when: >
+    disable_root_ssh_access|changed or
+    disable_password_authentication|changed
+
+- name: Add un-mirrored Ubuntu security repository
+  sudo: yes
+  lineinfile: >
+    dest=/etc/apt/sources.list
+    line='deb http://archive.ubuntu.com/ubuntu/ precise-security main restricted'
+
+# Install the unattended-upgrades package which allows to easily
+# install security updates. Note that this is not configured
+# to automatically install these updates.
+
+- name: Install security updater installer
+  apt: pkg=unattended-upgrades state=latest
+  sudo: yes
+
+- name: Install security updates
+  command: unattended-upgrades
+  sudo: yes
+
+- command: update-ca-certificates
+  sudo: yes
+
+- name: Install build environment
+  apt: "pkg=build-essential,python-software-properties,python,g++,make,libreadline-dev,zlib1g-dev,libssl-dev,libxslt-dev,libxml2-dev,git,openssl,curl state=present"
+  sudo: yes
+
+- name: Add Github to known hosts
+  lineinfile: >
+    dest=/etc/ssh/ssh_known_hosts
+    line="github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ=="
+    owner=root
+    group=root
+    state=present
+    insertafter=EOF
+    mode=0644
+    create=yes
+  sudo: yes
+
+- name: Create top-level directory structure for all projects/sites/apps/etc
+  file: path=/u/ group=root owner=root mode=0755 state=directory
+  sudo: yes

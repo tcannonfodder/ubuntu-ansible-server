@@ -1,0 +1,19 @@
+- name: Add directory for deployment path
+  file: group=vagrant owner=vagrant mode=0755 state=directory path={{ item }}
+  with_items:
+    - "{{ deploy_path }}"
+  sudo: yes
+
+- name: Checkout Master from github
+  connection: ssh
+  git:
+    repo: git@github.com:LockeCole117/test-site.git
+    dest: "{{ deploy_path }}"
+    ssh_opts: -vT
+  sudo: no
+
+- name: Cleanup repository
+  command: >
+    chdir={{ deploy_path }} git clean -d -x -f
+  sudo: no
+
