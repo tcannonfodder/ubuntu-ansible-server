@@ -11,12 +11,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # config.ssh.forward_agent = true
 
+
+  config.hostmanager.enabled = true
+  config.hostmanager.manage_host = true
+  config.hostmanager.ignore_private_ip = false
+  config.hostmanager.include_offline = true
+
   config.vm.define "server" do |machine|
     # Every Vagrant virtual environment requires a box to build off of.
     machine.vm.box = "precise64"
     machine.vm.box_url = "http://files.vagrantup.com/precise64.box"
     machine.vm.network :public_network
     machine.vm.network :forwarded_port, guest: 80, host: 8080
+    machine.hostmanager.aliases = %w(staticsite.dev)
   end
 
   config.vm.provision "ansible" do |ansible|
