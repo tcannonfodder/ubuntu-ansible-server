@@ -1,0 +1,5 @@
+- name: Install static site configuration
+  sudo: yes
+  template: >
+    src=staticsite.conf.j2 dest=/etc/nginx/configurations/staticsite.conf
+  notify: restart nginx

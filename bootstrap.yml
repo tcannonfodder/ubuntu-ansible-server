@@ -11,4 +11,7 @@
 
 - hosts: staticsite
   roles:
-  - { role: staticsite }
+  - { role: staticsite-base }
+  - { role: staticsite-nginx }
+  vars_files:
+    - staticsite_vars.yml
