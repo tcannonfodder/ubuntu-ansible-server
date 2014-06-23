@@ -17,3 +17,16 @@
 - name: Install nginx
   apt: pkg=nginx state=present
   sudo: yes
+
+- name: Create main configuration file
+  copy: src={{ item }} dest=/etc/nginx/{{ item }}
+  sudo: yes
+  with_items:
+    - nginx.conf
+  notify: restart nginx
+
+- name: Add directory for other configurations
+  file: group=vagrant owner=vagrant mode=0755 state=directory path={{ item }}
+  with_items:
+    - "/etc/nginx/configurations"
+  sudo: yes
