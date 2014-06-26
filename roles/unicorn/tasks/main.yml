@@ -1,0 +1,7 @@
+- name: Install Unicorn Service
+  copy: >
+    src=unicorn
+    dest=/etc/init.d/unicorn
+    owner=root group=root mode=0755
+  sudo: yes
+
