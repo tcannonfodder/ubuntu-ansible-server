@@ -1,0 +1,10 @@
+top_level_version:  2.1
+ruby_version:       2.1.2
+ruby_bin_suffix:    212
+ruby_name:          ruby-{{ ruby_version }}
+ruby_sha256:        f22a6447811a81f3c808d1c2a5ce3b5f5f0955c68c9a749182feb425589e6635
+ruby_tmp_path:      /tmp/{{ ruby_name }}
+ruby_source_path:   "{{ ruby_tmp_path }}"
+ruby_bin_path:      /usr/local/bin
+rubygems_version:   2.3.0
+rubygems_tmp_path:  /tmp/rubygems-{{ rubygems_version }}

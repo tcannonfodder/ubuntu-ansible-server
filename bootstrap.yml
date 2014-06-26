@@ -15,3 +15,9 @@
   - { role: staticsite-nginx }
   vars_files:
     - staticsite_vars.yml
+
+- hosts: railsapp
+  roles:
+  - { role: ruby-2.1.2 }
+  vars_files:
+    - railsapp_vars.yml

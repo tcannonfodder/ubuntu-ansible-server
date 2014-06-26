@@ -30,7 +30,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       ansible.playbook = "bootstrap.yml"
       ansible.groups = {
         "webserver" => ["server"],
-        "staticsite" => ["server"]
+        "staticsite" => ["server"],
+        "railsapp"   => ["server"]
       }
       ansible.host_key_checking = false
       # ansible.verbose =  'vvvv'

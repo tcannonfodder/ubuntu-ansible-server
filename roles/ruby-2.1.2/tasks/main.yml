@@ -1,0 +1,58 @@
+---
+- name: Clean Ruby compilation artifacts
+  shell: >
+    rm -rf /tmp/{{ ruby_name }}.tar.gz &&
+    rm -rf {{ ruby_tmp_path }}
+  when: force_ruby_install|default(false)
+
+- name: Download Ruby 2.1.2 installer
+  get_url: "url=http://cache.ruby-lang.org/pub/ruby/{{ top_level_version }}/ruby-{{ ruby_version }}.tar.gz dest=/tmp sha256sum={{ ruby_sha256 }}"
+  register: download_ruby
+
+- name: Unpack Ruby Source
+  command: "tar xzf {{ ruby_name }}.tar.gz chdir=/tmp creates={{ ruby_tmp_path }} "
+  register: Unpack
+  when: download_ruby|success
+
+- name: Configure Ruby
+  command: "./configure --program-suffix={{ ruby_bin_suffix }} creates={{ ruby_source_path }}/config.status chdir={{ ruby_source_path }}"
+  register: configure_ruby
+
+- name: Compile Ruby
+  command: "make chdir={{ ruby_source_path }} creates={{ ruby_source_path }}/ruby"
+  when: configure_ruby|success
+  register: compilation
+
+- name: Install Ruby
+  command: "make install chdir={{ ruby_source_path}}"
+  when: not compilation|skipped
+  sudo: yes
+
+- name: Download RubyGems
+  get_url: "url=http://production.cf.rubygems.org/rubygems/rubygems-{{ rubygems_version }}.tgz dest=/tmp"
+  register: download_rubygems
+
+- name: Unpack RubyGems
+  command: "tar xzf rubygems-{{ rubygems_version }}.tgz chdir=/tmp creates={{ rubygems_tmp_path }}"
+  register: Unpack
+  when: download_rubygems|success
+
+- name: Install RubyGems
+  command: "ruby{{ ruby_bin_suffix }} setup.rb chdir={{ rubygems_tmp_path }}"
+  when: not compilation|skipped
+  sudo: yes
+  register: rubygems
+
+- name: Update RubyGems
+  command: "gem{{ ruby_bin_suffix }} update --system"
+  sudo: yes
+  when: not rubygems|skipped
+
+- name: Configure RubyGems
+  copy: src=gemrc dest=/etc/gemrc owner=root group=root mode=0644
+  sudo: yes
+
+- name: Install Bundler
+  command: "gem{{ ruby_bin_suffix }} install bundler"
+  when: not compilation|skipped
+  sudo: yes
