@@ -59,6 +59,10 @@
   apt: "pkg=build-essential,python-software-properties,python,g++,make,libreadline-dev,zlib1g-dev,libssl-dev,libxslt-dev,libxml2-dev,git,openssl,curl state=present"
   sudo: yes
 
+- name: Install useful system monitoring tools
+  apt: "pkg=vim,htop"
+  sudo: yes
+
 - name: Add Github to known hosts
   lineinfile: >
     dest=/etc/ssh/ssh_known_hosts
