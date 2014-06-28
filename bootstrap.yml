@@ -20,5 +20,7 @@
   roles:
   - { role: ruby-2.1.2 }
   - { role: unicorn }
+  - { role: postgresql }
   vars_files:
     - railsapp_vars.yml
+    - "environments/production.yml"

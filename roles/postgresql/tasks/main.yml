@@ -1,0 +1,60 @@
+- name: Add PostgreSQL repository
+  apt_repository: repo='deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main' state=present
+  sudo: yes
+
+- name: Add PostgreSQL repository key
+  apt_key: url=https://www.postgresql.org/media/keys/ACCC4CF8.asc state=present
+  sudo: yes
+
+- name: Update apt cache
+  apt: update_cache=yes
+  sudo: yes
+
+- name: Create Posgres Data directory in deployment path
+  file: group=vagrant owner=vagrant mode=0755 state=directory path={{ item }}
+  with_items:
+    - "{{ pg_data_path }}"
+  sudo: yes
+
+# locale stuff forces installation to use UTF-8
+# --no-upgrade prevents newer patch versions from being installed,
+# as this would be disruptive
+# freezing to 9.3.4-1.pgdg12.4+1 for now. this will probably fail
+# in the future as new versions are released, but we can check that out
+# later. I've local copies of the deb packages in question.
+- name: Install PostgreSQL server
+  shell: >
+    LANG={{ locale }} LC_COLLATE={{ locale }} LC_CTYPE={{ locale }}
+    LC_MESSAGES={{ locale }} LC_MONETARY={{ locale }}
+    LC_NUMERIC={{ locale }} LC_TIME={{ locale }}
+    LC_ALL={{ locale }}
+    apt-get install -y --no-upgrade postgresql-9.3=9.3.4-1.pgdg12.4+1
+  sudo: yes
+
+# Ubuntu's postgresql package has no way of specifying the data dir,
+# so we'll just move it after the fact
+- name: Move PostgreSQL data directory into place
+  sudo: yes
+  shell: |
+    if [ ! -d "{{ pg_data_path }}" ]; then
+      service postgresql stop
+      cp -aRv /var/lib/postgresql/9.3/main {{ pg_data_path }}
+      rm -rf /var/lib/postgresql/9.3/main
+      ln -s {{ pg_data_path }} /var/lib/postgresql/9.3/main
+      service postgresql start
+    fi
+
+- name: Install PostgreSQL extensions
+  apt: pkg=postgresql-contrib-9.3 state=present
+  sudo: yes
+
+- name: Install PostgreSQL development library
+  apt: pkg=libpq-dev state=present
+  sudo: yes
+
+- name: Configure PostgreSQL server options
+  sudo: yes
+  template: >
+    src=postgresql.conf.j2 dest={{ pg_conf_path }}/postgresql.conf
+    mode=0644 owner=postgres group=postgres
+  notify: restart postgresql
