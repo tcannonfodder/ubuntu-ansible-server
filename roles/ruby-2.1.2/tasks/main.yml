@@ -19,9 +19,10 @@
   register: configure_ruby
 
 - name: Compile Ruby
-  command: "make chdir={{ ruby_source_path }} creates={{ ruby_source_path }}/ruby"
+  command: "make chdir={{ ruby_source_path }} creates={{ ruby_source_path }}/ruby{{ruby_bin_suffix}}"
   when: configure_ruby|success
   register: compilation
+  sudo: yes
 
 - name: Install Ruby
   command: "make install chdir={{ ruby_source_path}}"
