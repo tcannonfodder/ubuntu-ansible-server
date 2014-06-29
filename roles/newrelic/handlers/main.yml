@@ -1,0 +1,3 @@
+- name: start new relic server monitoring
+  service: name=newrelic-sysmond state=started
+  sudo: yes

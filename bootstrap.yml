@@ -2,10 +2,12 @@
 - hosts: all
   vars_files:
     - vars.yml
+    - "environments/production.yml"
   roles:
   - { role: common }
   - { role: logentries }
   - { role: common-logentries }
+  - { role: newrelic }
 
 - hosts: webserver
   roles:

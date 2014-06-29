@@ -7,3 +7,5 @@ github_public_key_location: '~/.ssh/id_rsa.pub'
 # Uncomment the lines below and add your keys to define them
 
 # logentries_account_key: 
+# newrelic_license_key: 
+# newrelic_server_monitoring: true

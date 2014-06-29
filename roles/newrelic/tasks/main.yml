@@ -1,0 +1,25 @@
+- name: Add New Relic repository
+  apt_repository: repo='deb http://apt.newrelic.com/debian/ newrelic non-free' state=present
+  sudo: yes
+  when: newrelic_server_monitoring is defined and newrelic_server_monitoring is true
+
+- name: Install New Relic repository key
+  apt_key: "url=https://download.newrelic.com/548C16BF.gpg state=present"
+  sudo: yes
+  when: newrelic_server_monitoring is defined and newrelic_server_monitoring is true
+
+- name: Update apt cache
+  apt: update_cache=yes
+  sudo: yes
+  when: newrelic_server_monitoring is defined and newrelic_server_monitoring is true
+
+- name: Install New Relic server monitoring
+  apt: pkg=newrelic-sysmond state=present
+  sudo: yes
+  when: newrelic_server_monitoring is defined and newrelic_server_monitoring is true
+
+- name: Configure New Relic server monitoring license apt_key
+  sudo: yes
+  command: nrsysmond-config --set license_key={{ newrelic_license_key }}
+  when: newrelic_server_monitoring is defined and newrelic_server_monitoring is true
+  notify: start new relic server monitoring
