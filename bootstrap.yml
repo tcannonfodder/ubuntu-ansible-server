@@ -31,6 +31,7 @@
   - { role: nodejs}
   - { role: unicorn }
   - { role: postgresql }
+  - { role: redis }
   - { role: imagemagick }
   - { role: memcached }
   - { role: memcached-logentries }

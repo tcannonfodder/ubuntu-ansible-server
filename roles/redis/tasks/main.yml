@@ -1,0 +1,15 @@
+- name: Add redis stable repository
+  apt_repository: repo='ppa:rwky/redis'
+  sudo: yes
+
+- name: Install Redis repository key
+  apt_key: "url=http://keyserver.ubuntu.com:11371/pks/lookup?op=get&search=0xDBB0271C5862E31D state=present"
+  sudo: yes
+
+- name: Update apt cache
+  apt: update_cache=yes
+  sudo: yes
+
+- name: Install Redis
+  apt: pkg=redis-server state=installed
+  sudo: yes
