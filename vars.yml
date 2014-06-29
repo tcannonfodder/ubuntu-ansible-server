@@ -1,2 +1,9 @@
 # Change if you use a different public key to connect to github
 github_public_key_location: '~/.ssh/id_rsa.pub'
+
+######################################################################
+# EXTERNAL APPS AND SERVICES
+# If not defined, the services won't be installed and set up.
+# Uncomment the lines below and add your keys to define them
+
+# logentries_account_key: 

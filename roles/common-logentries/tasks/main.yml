@@ -1,0 +1,6 @@
+- name: Follow Syslog log
+  sudo: yes
+  command: le follow {{ item.path }} --name {{ item.name | quote }}
+  when: logentries_account_key is defined
+  with_items:
+   - { path: "/var/log/syslog", name: "syslog"  }

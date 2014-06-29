@@ -1,0 +1,40 @@
+# sudo -sH
+# echo 'deb http://rep.logentries.com/ precise main' > /etc/apt/sources.list.d/logentries.list
+# gpg --keyserver pgp.mit.edu --recv-keys C43C79AD && gpg -a --export C43C79AD | apt-key add -
+# apt-get update
+# apt-get install python-setproctitle logentries
+# le register
+# apt-get install logentries-daemon
+
+- name: Set up Logentries repository
+  sudo: yes
+  apt_repository: >
+    repo='deb http://rep.logentries.com/ precise main'
+    state=present
+  when: logentries_account_key is defined
+
+- name: Install Logentries repository key
+  sudo: yes
+  shell: >
+    gpg --keyserver pgp.mit.edu --recv-keys C43C79AD && gpg -a --export C43C79AD | apt-key add -
+  when: logentries_account_key is defined
+
+- name: Update apt cache
+  apt: update_cache=yes
+  sudo: yes
+  when: logentries_account_key is defined
+
+- name: Install Logentries dynamic access firewall agent
+  sudo: yes
+  apt: "pkg=python-setproctitle,logentries state=latest"
+  when: logentries_account_key is defined
+
+- name: Register Logentries agent
+  sudo: yes
+  command: creates=/etc/le/config le register --account-key={{ logentries_account_key }}
+  when: logentries_account_key is defined
+
+- name: Install Logentries daemon
+  sudo: yes
+  apt: "pkg=logentries-daemon state=latest"
+  when: logentries_account_key is defined

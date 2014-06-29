@@ -4,10 +4,13 @@
     - vars.yml
   roles:
   - { role: common }
+  - { role: logentries }
+  - { role: common-logentries }
 
 - hosts: webserver
   roles:
   - { role: nginx }
+  - { role: nginx-logentries }
   vars_files:
     - vars.yml
 
@@ -15,6 +18,7 @@
   roles:
   - { role: staticsite-base }
   - { role: staticsite-nginx }
+  - { role: staticsite-logentries }
   vars_files:
     - vars.yml
     - staticsite_vars.yml

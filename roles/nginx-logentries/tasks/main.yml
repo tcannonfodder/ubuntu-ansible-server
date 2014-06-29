@@ -1,0 +1,7 @@
+- name: Follow Access and Error Logs
+  sudo: yes
+  command: le follow {{ item.path }} --name {{ item.name | quote }}
+  when: logentries_account_key is defined
+  with_items:
+    - { path: "/var/log/nginx/access.log", name: "Nginx Access" }
+    - { path: "/var/log/nginx/error.log",  name: "Nginx Error" }
