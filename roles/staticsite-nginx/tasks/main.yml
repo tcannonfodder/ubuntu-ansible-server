@@ -1,3 +1,9 @@
+- name: Create directory for logfiles
+  sudo: yes
+  file: group=vagrant owner=vagrant mode=0755 state=directory path={{ item }}
+  with_items:
+    - "{{ staticsite_logs_path }}"
+
 - name: Install static site configuration
   sudo: yes
   template: >

@@ -1,1 +1,3 @@
-deploy_path: /u/staticsite
+staticsite_shared_path: /u/staticsite
+staticsite_deploy_path: "{{ staticsite_shared_path }}/content"
+staticsite_logs_path: "{{ staticsite_shared_path }}/logs"

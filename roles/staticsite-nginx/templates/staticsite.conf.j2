@@ -2,5 +2,7 @@ server {
   listen 80;
   server_name staticsite.com www.staticsite.com staticsite.dev;
 
-  root {{ deploy_path }};
+  root {{ staticsite_deploy_path }};
+  access_log {{ staticsite_logs_path }}/access.log main;
+  error_log  {{ staticsite_logs_path }}/error.log;
 }
