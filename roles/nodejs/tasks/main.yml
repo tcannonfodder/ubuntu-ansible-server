@@ -1,0 +1,15 @@
+- name: Add Node.js stable repository
+  apt_repository: repo='ppa:chris-lea/node.js'
+  sudo: yes
+
+- name: Install Node.js repository key
+  apt_key: "url=http://keyserver.ubuntu.com:11371/pks/lookup?op=get&search=0xB9316A7BC7917B12 state=present"
+  sudo: yes
+
+- name: Update apt cache
+  apt: update_cache=yes
+  sudo: yes
+
+- name: Install Node.js
+  apt: pkg=nodejs state=present
+  sudo: yes

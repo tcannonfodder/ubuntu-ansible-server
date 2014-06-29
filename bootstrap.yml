@@ -28,6 +28,7 @@
 - hosts: railsapp
   roles:
   - { role: ruby-2.1.2 }
+  - { role: nodejs}
   - { role: unicorn }
   - { role: postgresql }
   - { role: imagemagick }
