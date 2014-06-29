@@ -21,6 +21,7 @@
   - { role: ruby-2.1.2 }
   - { role: unicorn }
   - { role: postgresql }
+  - { role: imagemagick }
   vars_files:
     - railsapp_vars.yml
     - "environments/production.yml"
