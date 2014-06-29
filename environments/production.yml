@@ -5,3 +5,5 @@ postgresql:
   work_mem:             4MB
   maintenance_work_mem: 64MB
   effective_cache_size: 512MB
+memcached:
+  size: 64

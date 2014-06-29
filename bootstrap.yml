@@ -29,6 +29,8 @@
   - { role: unicorn }
   - { role: postgresql }
   - { role: imagemagick }
+  - { role: memcached }
+  - { role: memcached-logentries }
   vars_files:
     - vars.yml
     - railsapp_vars.yml
