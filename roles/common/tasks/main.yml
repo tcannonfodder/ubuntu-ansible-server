@@ -6,6 +6,11 @@
   apt:  update_cache=yes
   sudo: yes
 
+# This is the main user for all deployment activities
+- name: Create deployment user "deploy"
+  user: name=deploy state=present shell=/bin/bash
+  sudo: yes
+
 # this is required for forwarding ssh keys when deploying
 - name: Allow current user to connect to deploy user via ssh
   authorized_key: >
