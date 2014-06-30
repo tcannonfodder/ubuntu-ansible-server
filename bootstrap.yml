@@ -38,6 +38,8 @@
   - { role: s3cmd }
   - { role: railsapp-base}
   - { role: railsapp-logrotation}
+  - { role: railsapp-database}
+  - { role: postgresql-users }
   vars_files:
     - vars.yml
     - railsapp_vars.yml

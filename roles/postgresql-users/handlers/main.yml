@@ -1,0 +1,3 @@
+- name: reload postgresql configuration
+  service: name=postgresql state=restarted
+  sudo: yes

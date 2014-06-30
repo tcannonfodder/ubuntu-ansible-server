@@ -1,0 +1,15 @@
+# A role to specifically set the postgres client connections for the application.
+# Although you can create users and set permissions on a per-app basis, the client should
+# only allow an explicity set of connections and authentication types.
+# We *could* use "make sure this line exists in the file," but that opens the
+# server up to security risks, as users and permissions can be changed without
+# our automated deployments correcting it.
+
+
+- name: Configure database connection rights
+  sudo: yes
+  copy: >
+    dest={{ pg_conf_path }}/pg_hba.conf
+    src=pg_hba.conf
+    mode=0640 owner=postgres group=postgres
+  notify: reload postgresql configuration

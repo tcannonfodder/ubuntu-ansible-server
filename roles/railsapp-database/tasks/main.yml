@@ -1,0 +1,107 @@
+# This will return 0 if the database doesn't exist
+
+- name: Check if the production database doesn't exist
+  sudo: yes
+  sudo_user: postgres
+  shell: >
+    psql -lqt | cut -d \| -f 1 | grep -w {{ app_name }} | wc -l
+  register: database_exists
+
+- name: Create Database Owner User
+  sudo: yes
+  sudo_user: postgres
+  postgresql_user: >
+    name={{ app_name }}_owner
+    password={{ postgresql_railsapp_owner_password }}
+  when: database_exists.stdout == '0'
+
+- name: Create Database App User
+  sudo: yes
+  sudo_user: postgres
+  postgresql_user: >
+    name={{ app_name }}_app
+    password={{ postgresql_railsapp_app_password }}
+  when: database_exists.stdout == '0'
+
+- name: Create production database
+  sudo: yes
+  sudo_user: postgres
+  when: database_exists.stdout == '0'
+  postgresql_db: >
+    name={{ app_name }}
+    encoding='UTF-8'
+    lc_collate='en_US.UTF-8'
+    lc_ctype='en_US.UTF-8'
+    template='template0'
+
+- name: Set the Database Owner user to own the database
+  sudo: yes
+  sudo_user: postgres
+  when: database_exists.stdout == '0'
+  shell: >
+    psql -d {{ app_name }} -c "ALTER DATABASE {{ app_name }} OWNER TO {{ app_name }}_owner;"
+
+- name: Grant all permissions on production database to owner
+  sudo: yes
+  sudo_user: postgres
+  when: database_exists.stdout == '0'
+  postgresql_privs: >
+    database={{ app_name }}
+    state=present
+    privs=ALL
+    type=database
+    role={{ app_name }}_owner
+
+- name: Grant connect rights for the Database to the App user
+  sudo: yes
+  sudo_user: postgres
+  when: database_exists.stdout == '0'
+  postgresql_privs: >
+    database={{ app_name }}
+    state=present
+    privs=CONNECT
+    type=database
+    role={{ app_name }}_owner
+
+- name: Revoke all table permissions to public schema from everyone
+  sudo: yes
+  sudo_user: postgres
+  when: database_exists.stdout == '0'
+  postgresql_privs: >
+    state=absent
+    schema=public
+    privs=ALL
+    objs=ALL_IN_SCHEMA
+    type=table
+    role=PUBLIC
+
+- name: Grant Table Select/Insert/Update/Delete in public schema to App User
+  sudo: yes
+  sudo_user: postgres
+  when: database_exists.stdout == '0'
+  postgresql_privs: >
+    state=present
+    schema=public
+    privs=SELECT,INSERT,UPDATE,DELETE
+    objs=ALL_IN_SCHEMA
+    type=table
+    role={{ app_name }}_app
+
+- name: Grant Sequence Select/Usage in public schema to App User
+  sudo: yes
+  sudo_user: postgres
+  when: database_exists.stdout == '0'
+  postgresql_privs: >
+    state=present
+    schema=public
+    privs=SELECT,USAGE
+    objs=ALL_IN_SCHEMA
+    type=squence
+    role={{ app_name }}_app
+
+- name: Grant Default privlges for App User
+  sudo: yes
+  sudo_user: postgres
+  when: database_exists.stdout == '0'
+  shell: >
+    psql -d {{ app_name }} -c "SET ROLE {{ app_name}}_owner ; ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO {{ app_name }}_app; ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO {{app_name}}_app;"

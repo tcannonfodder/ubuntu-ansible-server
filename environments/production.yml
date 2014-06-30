@@ -9,4 +9,4 @@ memcached:
   size: 64
 
 postgresql_railsapp_owner_password: test1234
-postgresql_railsapp_app_password: test1234
+postgresql_railsapp_app_password: abcd1234
