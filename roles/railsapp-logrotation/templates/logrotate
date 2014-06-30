@@ -1,0 +1,10 @@
+{{ railsapp_log_path }}/*.log {
+  rotate 10
+  daily
+  size=1M
+  missingok
+  compress
+  delaycompress
+  notifempty
+  copytruncate
+}

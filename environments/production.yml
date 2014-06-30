@@ -7,3 +7,6 @@ postgresql:
   effective_cache_size: 512MB
 memcached:
   size: 64
+
+postgresql_railsapp_owner_password: test1234
+postgresql_railsapp_app_password: test1234

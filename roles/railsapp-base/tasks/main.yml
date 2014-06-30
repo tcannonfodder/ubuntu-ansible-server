@@ -1,0 +1,55 @@
+# This is the user this particular Rails app's
+# unicorns run as. They:
+# - Can't log in interactively
+# - Have rights to read application secrets
+# - Can connect to the database as the app user
+# - Are isolated from the www-data user, which is used
+#   for nginx
+- name: Create unicorn user
+  user: "name={{ unicorn_user }} state=present"
+  sudo: yes
+
+- name: Create top-level directory structure
+  file: "path={{ railsapp_path }} group=root owner=root mode=0755 state=directory"
+  sudo: yes
+
+# The directory structure follows conventions previously set by
+# Capistrano:
+# `releases` stores the code for deployed revisions
+# `scripts`  stores scripts that are used to manage the Rails app (not kept in app repo)
+# `shared`   where files used across revisions are stored (logs, config files)
+#   `shared/bundle` where bundler gems are stored
+#   `shared/scripts` where scripts kept in the application's repository are stored
+- name: Create basic Rails application directory structure
+  file: group=deploy owner=deploy mode=0755 state=directory path={{ item }}
+  with_items:
+    - "{{ railsapp_releases_path }}"
+    - "{{ railsapp_scripts_path }}"
+    - "{{ railsapp_shared_path }}"
+    - "{{ railsapp_shared_path }}/bundle"
+    - "{{ railsapp_shared_path }}/scripts"
+  sudo: yes
+
+# These directories are used when running the rails app itself
+# or the scripts surrounding it. Therefore, they need to be writable
+# by the unicorn user
+
+- name: Create unicorn-writable app directories
+  file: "group={{ unicorn_user }} owner={{ unicorn_user }} mode=0755 state=directory path={{ item }}"
+  with_items:
+    - "{{ railsapp_shared_path }}/backups"
+    - "{{ railsapp_shared_path }}/system"
+    - "{{ railsapp_shared_path }}/pids"
+    - "{{ railsapp_shared_path }}/tmp"
+    - "{{ railsapp_log_path }}"
+    - "{{ railsapp_shared_path }}/data"
+  sudo: yes
+
+# Create the database configuration file by using our
+# template (which sets the database name and password)
+- name: Configure database connection
+  template: >
+    src=database.yml.j2
+    dest={{ railsapp_shared_path }}/database.yml
+    group={{ unicorn_user }} owner={{ unicorn_user }} mode=0400
+  sudo: yes

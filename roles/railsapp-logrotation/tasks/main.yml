@@ -1,0 +1,5 @@
+- name: Set up log rotation
+  sudo: yes
+  template: >
+    src=logrotate dest=/etc/logrotate.d/{{ app_name }}
+    mode=0644 owner=root group=root
