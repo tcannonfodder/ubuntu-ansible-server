@@ -17,7 +17,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.hostmanager.ignore_private_ip = false
   config.hostmanager.include_offline = true
 
-  config.vm.define "server" do |machine|
+  config.vm.define "server", :primary => true do |machine|
     # Every Vagrant virtual environment requires a box to build off of.
     machine.vm.box = "precise64"
     machine.vm.box_url = "http://files.vagrantup.com/precise64.box"
