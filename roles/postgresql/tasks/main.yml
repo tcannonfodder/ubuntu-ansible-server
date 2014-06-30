@@ -13,7 +13,7 @@
 - name: Create Posgres Data directory in deployment path
   file: group=vagrant owner=vagrant mode=0755 state=directory path={{ item }}
   with_items:
-    - "{{ pg_data_path }}"
+    - "/u/postgres"
   sudo: yes
 
 # locale stuff forces installation to use UTF-8
@@ -50,6 +50,10 @@
 
 - name: Install PostgreSQL development library
   apt: pkg=libpq-dev state=present
+  sudo: yes
+
+- name: Install python-psycopg2 for provisioning
+  apt: pkg=python-psycopg2 state=present
   sudo: yes
 
 - name: Configure PostgreSQL server options
