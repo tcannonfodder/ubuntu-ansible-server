@@ -37,7 +37,7 @@
 - name: Create unicorn-writable app directories
   file: "group={{ unicorn_user }} owner={{ unicorn_user }} mode=0755 state=directory path={{ item }}"
   with_items:
-    - "{{ railsapp_shared_path }}/backups"
+    - "{{ railsapp_backup_path }}"
     - "{{ railsapp_shared_path }}/system"
     - "{{ railsapp_shared_path }}/pids"
     - "{{ railsapp_shared_path }}/tmp"

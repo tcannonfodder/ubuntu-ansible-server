@@ -1,0 +1,10 @@
+# In order to read the env.yml file that's generated, the
+# backup script runs under the unicorn user. This also limits
+# what the script can do, just in case.
+- name: Install Railsapp database S3 backup
+  sudo: yes
+  template: >
+    src=backup.rb.j2
+    dest={{ railsapp_scripts_path }}/s3_backup.rb
+    owner={{ unicorn_user }} group={{ unicorn_user }}
+    mode=644

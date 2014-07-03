@@ -1,0 +1,54 @@
+require 'logger'
+require 'yaml'
+require 'honeybadger'
+
+log = Logger.new('{{ railsapp_log_path }}/backup.log')
+
+
+# Load up the environment variable created for scripts
+env_file = "{{ railsapp_scripts_path }}/env.yml"
+if File.exist?(env_file)
+  config = YAML.load_file(env_file)
+  config.each { |key, value| ENV[key.to_s] = value.to_s }
+else
+  log.error "Fatal: File #{env_file} not found."
+  abort
+end
+
+unless ENV['honeybadger_api_key'].empty?
+  Honeybadger.configure do |config|
+    config.api_key = ENV['honeybadger_api_key']
+  end
+end
+
+begin
+  db_name = 'railsapp'
+  backups_path = "{{ railsapp_backup_path }}"
+  db_password = ENV['postgresql_railsapp_owner_password']
+  password = ENV['backup_password']
+  time = Time.now.strftime("%Y-%m-%d-%H%M")
+  filename = "#{backups_path}/#{`hostname`.strip}-#{time}.dump"
+
+  log.info "Starting backup #{filename}"
+  pg_dump = `PGPASSWORD=#{db_password} nice -n 5 pg_dump -U railsapp_owner -Fc -w -x -O -f #{filename} #{db_name} 2>&1`
+  if pg_dump.strip.empty?
+    log.info "Finished backup: #{filename}"
+
+    log.info "Starting encryption"
+    system "nice -n 10 openssl enc -aes-256-cbc -salt -in #{filename} -out #{filename}.encrypted -pass pass:#{password}"
+    system "rm #{filename}"
+    log.info "Finished encryption"
+
+    log.info "Starting S3 push…"
+    `s3cmd -c /u/apps/railsapp/scripts/s3cmd.cfg put #{filename}.encrypted s3://railsapp-backups`
+    log.info "…finished S3 push"
+
+    log.info "Removing old backups"
+    `/bin/sh -c "ls -dt #{backups_path}/* | tail -n +7 | xargs rm -fr"`
+  else
+    log.error "pg_dump failed: #{pg_dump}"
+  end
+rescue Exception => e
+  log.error "Exception: #{e.inspect}"
+  Honeybadger.notify_or_ignore(e)
+end

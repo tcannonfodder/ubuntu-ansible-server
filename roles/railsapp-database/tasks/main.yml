@@ -105,3 +105,5 @@
   when: database_exists.stdout == '0'
   shell: >
     psql -d {{ app_name }} -c "SET ROLE {{ app_name}}_owner ; ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO {{ app_name }}_app; ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO {{app_name}}_app;"
+
+- include: backup.yml
