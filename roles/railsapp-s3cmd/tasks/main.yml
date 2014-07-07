@@ -1,0 +1,5 @@
+- name: Generate s3cmd configuration file
+  sudo: yes
+  template: >
+    src=s3cmd.cfg.j2 dest={{ railsapp_scripts_path }}/s3cmd.cfg
+    mode=0400 owner={{ unicorn_user }} group={{ unicorn_user }}
