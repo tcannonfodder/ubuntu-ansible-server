@@ -9,10 +9,6 @@
   user: "name={{ unicorn_user }} state=present"
   sudo: yes
 
-- name: Create top-level directory structure
-  file: "path={{ railsapp_path }} group=root owner=root mode=0755 state=directory"
-  sudo: yes
-
 # The directory structure follows conventions previously set by
 # Capistrano:
 # `releases` stores the code for deployed revisions
@@ -23,6 +19,7 @@
 - name: Create basic Rails application directory structure
   file: group=deploy owner=deploy mode=0755 state=directory path={{ item }}
   with_items:
+    - "{{ railsapp_path }}"
     - "{{ railsapp_releases_path }}"
     - "{{ railsapp_scripts_path }}"
     - "{{ railsapp_shared_path }}"
