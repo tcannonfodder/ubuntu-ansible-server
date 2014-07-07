@@ -1,3 +1,10 @@
+- name: create Unicorn configuration directory
+  file: >
+    path=/etc/unicorn
+    state=directory
+    owner=root group=root mode=0644
+  sudo: yes
+
 - name: Install Unicorn Service
   copy: >
     src=unicorn
