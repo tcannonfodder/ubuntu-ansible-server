@@ -1,0 +1,9 @@
+# disabled for non-production
+- name: Schedule hourly database backups
+  sudo: yes
+  cron: >
+    name="Database backup"
+    job="cd {{ railsapp_current_path }} && RAILS_ENV=production /usr/local/bin/bundle exec /usr/local/bin/ruby212 {{ railsapp_scripts_path }}/cloudfiles_backup.rb >> {{ railsapp_log_path }}/backup.log 2>&1 {{ dead_mans_snitch.railsapp_database_backup|default('') }}"
+    minute=0
+    user={{ unicorn_user }}
+  when: railsapp_environment == "production"

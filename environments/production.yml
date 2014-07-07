@@ -1,3 +1,12 @@
+# this is not the rails environment, which is always "production",
+# but is used by the deployment process to decide if certain things
+# like automated nightly billing should be installed and enabled
+# can be "development", "staging", "production"
+railsapp_environment: production
+dead_mans_snitch:
+  railsapp_database_backup: "&& curl https://nosnch.in/abcd1234 &> /dev/null"
+
+
 postgresql:
   max_connections:      25
   shared_buffers:       256MB

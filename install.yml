@@ -51,6 +51,7 @@
   - { role: railsapp-resque }
   - { role: railsapp-unicorn }
   - { role: railsapp-deploy }
+  - { role: railsapp-cron }
   vars_files:
     - vars.yml
     - railsapp_vars.yml
