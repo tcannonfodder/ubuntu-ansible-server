@@ -48,6 +48,7 @@
   - { role: railsapp-database}
   - { role: postgresql-users }
   - { role: railsapp-s3cmd }
+  - { role: railsapp-resque }
   - { role: railsapp-unicorn }
   - { role: railsapp-deploy }
   vars_files:

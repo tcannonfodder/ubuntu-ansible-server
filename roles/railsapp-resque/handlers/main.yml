@@ -1,0 +1,1 @@
+- include: "../../resque/handlers/resque.yml name={{ app_name }}-resque-worker"

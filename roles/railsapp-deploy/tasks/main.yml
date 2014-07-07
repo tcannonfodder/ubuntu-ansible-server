@@ -183,6 +183,7 @@
     ln -s {{ release_path }} {{ railsapp_current_path }}
   notify:
     - "restart {{app_name}}-unicorn"
+    - "restart {{app_name}}-resque-worker"
   when: new_release|changed
 
 - name: Record deployment in New Relic

@@ -1,0 +1,6 @@
+- include: >
+    ../../resque/tasks/resque.yml
+    name={{ app_name }}-resque-worker
+    queues=caches
+    app_path={{ railsapp_current_path }}
+    user_name={{ unicorn_user }}
