@@ -1,0 +1,4 @@
+release_name: "{{ ansible_date_time.iso8601|replace('-','')|replace(':','')|replace('T','')|replace('Z','') }}"
+release_path: "{{ railsapp_releases_path }}/{{ release_name }}"
+
+cached_copy_path: "{{ railsapp_shared_path }}/cached-copy"

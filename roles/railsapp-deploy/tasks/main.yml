@@ -1,0 +1,203 @@
+# This assumes that the local user has access rights to
+# the git repo. the key is forwarded via ssh. The git repo
+# is retained for the next deployment so only a simple pull
+# has to be done.
+- name: Grab a temporary copy of the latest release [{{ railsapp_git_branch }}]
+  remote_user: deploy
+  connection: ssh
+  git:
+    repo: "{{ railsapp_git_repo_url }}"
+    dest: "{{ cached_copy_path }}"
+    version: "{{ railsapp_git_branch }}"
+    ssh_opts: -vT
+  sudo: no
+
+- name: Reset repository to latest [{{ railsapp_git_branch }}]
+  remote_user: deploy
+  command: >
+    chdir={{ cached_copy_path }} git reset --hard
+
+- name: Clean repository
+  remote_user: deploy
+  command: >
+    chdir={{ cached_copy_path }} git clean -d -x -f
+
+- name: Parse repository revision
+  remote_user: deploy
+  command: >
+    chdir={{ cached_copy_path }} git rev-parse HEAD
+  register: revision
+
+- name: Read installed revision (if any)
+  remote_user: deploy
+  shell: >
+    chdir={{ railsapp_path }}
+    test -e current/REVISION && cat current/REVISION
+  register: current_revision
+  ignore_errors: true
+
+- name: Copy release files
+  shell: >
+    cp -RPp {{ cached_copy_path }} {{ release_path }}
+  sudo: yes
+  when: railsapp_force_release or (current_revision.stdout != revision.stdout)
+  register: new_release
+
+- name: Create REVISION file
+  remote_user: deploy
+  copy: content={{ revision.stdout }} dest={{ release_path }}/REVISION
+  when: new_release|changed
+
+- name: Set release ownership
+  file: path={{ release_path }} owner=deploy group=deploy recurse=true
+  sudo: yes
+  when: new_release|changed
+
+# In conjunction with the --deployment flag this should make bundles
+# reusable between releases, so that only the minimum of work has to
+# be done by bundler
+- name: Symlink bundler
+  remote_user: deploy
+  file: >
+    src={{ railsapp_shared_path }}/bundle
+    dest={{ release_path }}/vendor/bundle
+    owner=deploy group=deploy
+    state=link
+  when: new_release|changed
+
+- name: Run bundler
+  remote_user: deploy
+  command: >
+    chdir={{ release_path }}
+    bundle install --deployment --without=development test
+  when: new_release|changed
+
+- name: Set symlinks to shared data
+  file: >
+    src={{ railsapp_shared_path }}/{{ item.src }}
+    dest={{ release_path }}/{{ item.dest }}
+    state=link group=deploy owner=deploy
+  with_items:
+    - { src: "database.yml", dest: "config/database.yml" }
+    - { src: "data", dest: "data" }
+    - { src: "tmp", dest: "tmp" }
+    - { src: "log", dest: "log" }
+    - { src: "system", dest: "public/system" }
+    - { src: "unicorn.rb", dest: "config/unicorn.rb" }
+  sudo: yes
+  when: new_release|changed
+
+# Overwrite the env.yml password and secrets file in Rails with the one
+# for the current deployment environment. These should only be readable
+# by the unicorns and when running rake tasks.
+- name: Delete standard Rails environment file
+  sudo: yes
+  file: >
+    state=absent path={{ release_path }}/config/env.yml
+  when: new_release|changed
+- name: Generate Rails environment file
+  sudo: yes
+  template: >
+    src=env.yml.j2 dest={{ release_path }}/config/env.production.yml
+    mode=0400 owner={{ unicorn_user }} group={{ unicorn_user }}
+  when: new_release|changed
+- name: Generate Rails environment file for the migration environment
+  sudo: yes
+  template: >
+    src=env.yml.j2 dest={{ release_path }}/config/env.migration.yml
+    mode=0400 owner={{ unicorn_user }} group={{ unicorn_user }}
+  when: new_release|changed
+
+- name: Generate Rails environment file for scripts
+  sudo: yes
+  template: >
+    src=env.scripts.yml.j2 dest={{ railsapp_path }}/scripts/env.yml
+    mode=0400 owner={{ unicorn_user }} group={{ unicorn_user }}
+
+- name: Create assets folder
+  sudo: yes
+  file: >
+    path={{ release_path }}/public/assets
+    state=directory
+    group={{ unicorn_user }} owner={{ unicorn_user }}
+    mode=0700
+  when: new_release|changed
+
+- name: Package assets
+  sudo: yes
+  sudo_user: "{{ unicorn_user }}"
+  shell: >
+    chdir={{ release_path }}
+    RAILS_ENV=production bundle exec rake assets:precompile
+  when: new_release|changed
+
+- name: Compress assets
+  sudo: yes
+  sudo_user: "{{ unicorn_user }}"
+  shell: >
+    chdir={{ release_path }}/public/assets
+    find . -type f -name "*" -exec sh -c "gzip --best < {} > {}.gz" \;
+  when: new_release|changed
+
+- name: Secure assets folder
+  sudo: yes
+  file: >
+    path={{ release_path }}/public/assets
+    state=directory
+    group={{ unicorn_user }} owner={{ unicorn_user }}
+    mode=0555
+  when: new_release|changed
+
+# Run migrations before switching to newly deployed version later.
+# Migrations are required to be written in a way that it doesn't
+# affect the last deployed version.
+- name: Make schema.rb writable for unicorn user
+  sudo: yes
+  file: >
+    path={{ release_path }}/db/schema.rb
+    group={{ unicorn_user }} owner={{ unicorn_user }}
+    mode=0664
+  when: new_release|changed
+- name: Run migrations
+  sudo: yes
+  sudo_user: "{{ unicorn_user }}"
+  shell: >
+    chdir={{ release_path }}
+    RAILS_ENV=migration bundle exec rake db:migrate
+  when: new_release|changed
+- name: Return schema.rb to be owned by deploy
+  sudo: yes
+  file: >
+    path={{ release_path }}/db/schema.rb
+    group=deploy owner=deploy
+    mode=0664
+  when: new_release|changed
+
+# There was an issue where the file action didn't correctly create
+# this symlink. Creating it manually instead.
+# rm -f is used because the symlink may not yet exist
+- name: Symlink release to be current version
+  sudo: yes
+  shell: >
+    rm -f {{ railsapp_current_path }} &&
+    ln -s {{ release_path }} {{ railsapp_current_path }}
+  notify:
+    - "restart {{app_name}}-unicorn"
+  when: new_release|changed
+
+- name: Record deployment in New Relic
+  sudo: yes
+  sudo_user: "{{ unicorn_user }}"
+  shell: >
+    curl -H "x-api-key:{{ newrelic_license_key }}"
+    -d "deployment[app_name]={{ app_name }}"
+    -d "deployment[user]={{ hostvars['127.0.0.1']['local_user_and_hostname'].stdout }}"
+    -d "deployment[revision]={{ revision.stdout }}"
+    -d "deployment[description]={{ railsapp_git_tree_url }}/{{ revision.stdout }}"
+    https://api.newrelic.com/deployments.xml
+  when: new_release|changed and newrelic_license_key is defined
+
+- name: Cleanup old releases
+  shell: "ls -dt {{ railsapp_path }}/releases/* | tail -n +6 | xargs rm -fr"
+  sudo: yes
+  when: new_release|changed
