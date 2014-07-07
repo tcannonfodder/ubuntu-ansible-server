@@ -1,0 +1,15 @@
+- name: Configure Unicorn
+  template: >
+    src=unicorn.rb.j2
+    dest={{ railsapp_shared_path }}/unicorn.rb
+    owner={{ unicorn_user }} group={{ unicorn_user }} mode=0644
+  sudo: yes
+
+# This config file hooks into the larger `unicorn` service that was installed with the unicorn role
+# and will read the `config/unicorn.rb` file for additional configuration
+- name: Install unicorn service configuration hook
+  template: >
+    src=railsapp.conf.j2
+    dest=/etc/unicorn/{{ app_name }}.conf
+    group=root owner=root mode=0644
+  sudo: yes

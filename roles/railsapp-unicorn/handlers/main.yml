@@ -1,0 +1,7 @@
+# "upgrade" gracefully does a full restart of unicorn workers
+# and installs a new master (and reload configuration) as well
+# "reload" here would only restart workers, but not preload
+# a new version of the app
+- name: "restart {{ app_name }}-unicorn"
+  command: "service unicorn upgrade /etc/unicorn/{{app_name}}.conf"
+  sudo: yes
