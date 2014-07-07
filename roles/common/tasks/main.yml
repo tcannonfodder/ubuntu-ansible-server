@@ -2,6 +2,7 @@
 - name: Configure locale
   command: /usr/sbin/update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
   sudo: yes
+
 - name: Update apt cache
   apt:  update_cache=yes
   sudo: yes
@@ -14,9 +15,16 @@
 # this is required for forwarding ssh keys when deploying
 - name: Allow current user to connect to deploy user via ssh
   authorized_key: >
-    user=vagrant
+    user=deploy
     key="{{ lookup('file', github_public_key_location) }}"
   sudo: yes
+
+# note: this disables sudo for the vagrant user on VMs
+# use the deploy user from now on for bootstrapping
+- name: Enable sudo for user "deploy"
+  template: src=sudoers dest=/etc/sudoers validate="visudo -cf %s"
+  sudo: yes
+
 
 - name: Disable root SSH Access
   action: >
@@ -24,16 +32,21 @@
     regexp="^PermitRootLogin"
     line="PermitRootLogin no" state=present
   sudo: yes
+  remote_user: deploy
   register: disable_root_ssh_access
+
 - name: Disable Password Authentication
   action: >
     lineinfile dest=/etc/ssh/sshd_config
     regexp="^PasswordAuthentication"
     line="PasswordAuthentication no" state=present
   sudo: yes
+  remote_user: deploy
   register: disable_password_authentication
+
 - name: restart SSH
   sudo: yes
+  remote_user: deploy
   service: name=ssh state=restarted
   when: >
     disable_root_ssh_access|changed or
@@ -41,6 +54,7 @@
 
 - name: Add un-mirrored Ubuntu security repository
   sudo: yes
+  remote_user: deploy
   lineinfile: >
     dest=/etc/apt/sources.list
     line='deb http://archive.ubuntu.com/ubuntu/ precise-security main restricted'
@@ -51,21 +65,26 @@
 
 - name: Install security updater installer
   apt: pkg=unattended-upgrades state=latest
+  remote_user: deploy
   sudo: yes
 
 - name: Install security updates
   command: unattended-upgrades
+  remote_user: deploy
   sudo: yes
 
 - command: update-ca-certificates
+  remote_user: deploy
   sudo: yes
 
 - name: Install build environment
   apt: "pkg=build-essential,python-software-properties,python,g++,make,libreadline-dev,zlib1g-dev,libssl-dev,libxslt-dev,libxml2-dev,git,openssl,curl state=present"
+  remote_user: deploy
   sudo: yes
 
 - name: Install useful system monitoring tools
   apt: "pkg=vim,htop"
+  remote_user: deploy
   sudo: yes
 
 - name: Add Github to known hosts
@@ -78,8 +97,10 @@
     insertafter=EOF
     mode=0644
     create=yes
+  remote_user: deploy
   sudo: yes
 
 - name: Create top-level directory structure for all projects/sites/apps/etc
   file: path=/u/ group=root owner=root mode=0755 state=directory
   sudo: yes
+  remote_user: deploy

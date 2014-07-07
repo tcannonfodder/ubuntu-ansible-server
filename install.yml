@@ -1,0 +1,55 @@
+---
+- hosts: 127.0.0.1
+  connection: local
+  tasks:
+  - name: Read local user/host
+    shell: echo "`whoami`@`hostname`"
+    register: local_user_and_hostname
+- hosts: all
+  vars_files:
+    - vars.yml
+    - "environments/production.yml"
+  roles:
+  - { role: logentries }
+  - { role: common-logentries }
+  - { role: newrelic }
+
+- hosts: webserver
+  roles:
+  - { role: nginx }
+  - { role: nginx-logentries }
+  vars_files:
+    - vars.yml
+
+- hosts: staticsite
+  roles:
+  - { role: staticsite-base }
+  - { role: staticsite-nginx }
+  - { role: staticsite-logentries }
+  vars_files:
+    - vars.yml
+    - staticsite_vars.yml
+
+- hosts: railsapp
+  roles:
+  - { role: ruby-2.1.2 }
+  - { role: nodejs}
+  - { role: unicorn }
+  - { role: postgresql }
+  - { role: redis }
+  - { role: imagemagick }
+  - { role: memcached }
+  - { role: memcached-logentries }
+  - { role: s3cmd }
+  - { role: railsapp-base }
+  - { role: railsapp-nginx }
+  - { role: railsapp-logrotation}
+  - { role: railsapp-database}
+  - { role: postgresql-users }
+  - { role: railsapp-s3cmd }
+  - { role: railsapp-unicorn }
+  - { role: railsapp-deploy }
+  vars_files:
+    - vars.yml
+    - railsapp_vars.yml
+    - "environments/production.yml"

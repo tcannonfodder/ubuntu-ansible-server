@@ -5,42 +5,9 @@
     - "environments/production.yml"
   roles:
   - { role: common }
-  - { role: logentries }
-  - { role: common-logentries }
-  - { role: newrelic }
-
-- hosts: webserver
-  roles:
-  - { role: nginx }
-  - { role: nginx-logentries }
-  vars_files:
-    - vars.yml
-
-- hosts: staticsite
-  roles:
-  - { role: staticsite-base }
-  - { role: staticsite-nginx }
-  - { role: staticsite-logentries }
-  vars_files:
-    - vars.yml
-    - staticsite_vars.yml
-
-- hosts: railsapp
-  roles:
-  - { role: ruby-2.1.2 }
-  - { role: nodejs}
-  - { role: unicorn }
-  - { role: postgresql }
-  - { role: redis }
-  - { role: imagemagick }
-  - { role: memcached }
-  - { role: memcached-logentries }
-  - { role: s3cmd }
-  - { role: railsapp-base}
-  - { role: railsapp-logrotation}
-  - { role: railsapp-database}
-  - { role: postgresql-users }
-  vars_files:
-    - vars.yml
-    - railsapp_vars.yml
-    - "environments/production.yml"
+  tasks:
+    - name: Reboot to activate newly installed kernel
+      sudo: yes
+      remote_user: deploy
+      shell: "sleep 2s && /sbin/reboot &"
+      when: ansible_kernel != linux_kernel_version

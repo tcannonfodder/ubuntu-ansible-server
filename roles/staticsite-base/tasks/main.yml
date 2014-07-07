@@ -1,11 +1,12 @@
 - name: Add directory for deployment path
-  file: group=vagrant owner=vagrant mode=0755 state=directory path={{ item }}
+  file: group=deploy owner=deploy mode=0755 state=directory path={{ item }}
   with_items:
     - "{{ staticsite_shared_path }}"
   sudo: yes
 
 - name: Checkout Master from github
   connection: ssh
+  remote_user: deploy
   git:
     repo: "{{ staticsite_git_repo_url }}"
     dest: "{{ staticsite_deploy_path }}"
