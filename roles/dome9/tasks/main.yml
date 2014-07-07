@@ -1,0 +1,29 @@
+- name: Set up Dome9 repository
+  sudo: yes
+  apt_repository: >
+    repo='deb http://repository.dome9.com/ubuntu lucid main'
+    state=present
+  when: dome9_pairkey is defined
+
+- name: Install Dome9 repository key
+  apt_key: "url=http://repository.dome9.com/ubuntu/dome9-key.asc state=present"
+  sudo: yes
+  when: dome9_pairkey is defined
+
+- name: Update apt cache
+  apt: update_cache=yes
+  sudo: yes
+  when: dome9_pairkey is defined
+
+- name: Install Dome9 dynamic access firewall agent
+  sudo: yes
+  apt: pkg=dome9agent state=latest
+  when: dome9_pairkey is defined
+
+# TODO: Check if the agent is already paired and don't try again
+- name: Pair agent. No security groups are set (this should be done in Dome9)
+  sudo: yes
+  command: >
+    dome9d pair -k {{ dome9_pairkey }}
+  ignore_errors: yes
+  when: dome9_pairkey is defined

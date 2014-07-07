@@ -11,3 +11,4 @@ github_public_key_location: '~/.ssh/id_rsa.pub'
 # newrelic_server_monitoring: true
 # s3_backup_id: 
 # s3_backup_secret: 
+# dome9_pairkey: 

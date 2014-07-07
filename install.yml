@@ -13,6 +13,7 @@
   - { role: logentries }
   - { role: common-logentries }
   - { role: newrelic }
+  - { role: dome9 }
 
 - hosts: webserver
   roles:
