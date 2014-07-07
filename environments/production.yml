@@ -11,3 +11,54 @@ memcached:
 postgresql_railsapp_owner_password: test1234
 postgresql_railsapp_app_password: abcd1234
 railsapp_encryption_password: 1234s
+######################################################################
+# SSL
+# For development, this is a self-signed certificate for railsapp.dev
+railsapp_ssl_private_key: |
+  -----BEGIN RSA PRIVATE KEY-----
+  MIIEpQIBAAKCAQEA6Y+BwODYhc2iAg+eOtb854Rb9ZJwwYooXxSbbW/nefDD2Pr0
+  74EuJtmT2nY8PInwmlaM6t5uZCdqlSxgEbLwRD9RGOtzRUs50NCsUxayalcclLaV
+  E+8F42ykWOAJDr7Mpx+6wjenfcSyFpbcvMrsqKY6Qbc6ckK/Ww22drDzc3IBRA3T
+  o416AYV2LE37S4QFs4rrdzjLiXSPPdj4H4MAxhpe6r/kxvMUxaP061MSsAbVI21h
+  B9TcpR6TlbWIk+eqKP911rUDqd9d7VQttdr3R3GuD2JJuWDrBwLXX7DfrQLLCRoy
+  OFZpqNjF8QfqquF41Mbknd3hZZ7vMiXRMG1t9QIDAQABAoIBAQDJ4rMMzw46MnJM
+  h8WFJNp9IMsAbXGrycl1znE/WpBitjwD7YEVGbuT91S3bKZKyg1Ay3mJd3VCe1PE
+  2BO+mMbYp0ZpXPRJvGmgVw/tzluwUdYxsdUQ4vZbDEjPTfBmX4S1HVcolETiEMjD
+  f+oUAvAoI2+N6FzL8WhIw4Sp+fCmIwlp6BHkGchbbOOlCMxj4G+OnNfc/M2asqpt
+  VwKiRWZOsV+qbWQJ9kv4p2kl25IvSQk98lLgp23UAA8QDcIS6sjMzDEmmHcGjAVi
+  k9SRXtSP3xdB1jTWcHOaUe8b73wshkQfKiHGvyY6b/AePx5UJI982WdDzjCMuJTy
+  ufDpzCztAoGBAP5C81fh7s6Mv5TyJGF2CR5TsnE1m/QcmZt1yNJ7cRAUug7/chDB
+  /g0kLMAPigx6h1MbBR5GseY42uVMugSov1JeooVa2ljHGEDahiBNsUba1B5HimNi
+  lED4NvzieJduxRWse3EuffRxoAR7UJlon9eigVM2Wvb0FnX3umj0a+PzAoGBAOso
+  UniOWkNCY47xz3dnmZvcWlNyiZeYhrZEoP3vaWB2VzkFobxli8I6L3ek+rqqISAE
+  5LY638DFTvEnLkXUBnJfmtru8n060oUc7A3BApz5wZZEDCoDdlYpnU4lW5EFwWCT
+  7X6N/frOLhVtdW1OsqTWPd3zobdQtxIu7G/XVah3AoGBAKYxcsetyR8/RnZ/86G0
+  um8VPBzdcquUCh9gVLynrRZaxebJt3AWrQ0/6PQ88/oGGPAMSEMq6FtYLFQW27vx
+  5ORdMRPDd9bxg/vYGjWBMu/iVyXXkzA1Hjx9Qcv35+TrpWzuSd2ICxI9Nt/XDq7H
+  gTs8YBXZAIpMr2W6YCD8Ko1bAoGAQ5VEFne7A0eKO2PNn2B76iprHz50wsfIN4wD
+  xNdQrrN0H+Q5dl6syvZT/AvDL3CDsqMVZDYJZmqOZIpBJzpnW+mUJMW1lT4ZkL4e
+  LVnCOYEiHOCTqmNyWBL/rZzY8xX3XJ1HDS8bxkAJSIk7zV1nxC36e9ZwLLIa2zP3
+  KbF2YcMCgYEA5Ij4dHlm9eIFlSspMFKxdKmcVHe0OrMWmxpUoNL4pKGRyyM8RKbI
+  8JBAnq8/P3zEl6rxOuTSI0IgwTAIKsbxiqvWGrHOFGT4buqil0AfB+PPUXx8Leod
+  YRuFbiJAC5KseK2ddPQSdR3rg0cotpvo0sZSQDiQCIh1qjQTp/bo43s=
+  -----END RSA PRIVATE KEY-----
+
+railsapp_ssl_certificate: |
+  -----BEGIN CERTIFICATE-----
+  MIIC4DCCAcgCCQDAcgDwKfuo0DANBgkqhkiG9w0BAQUFADAyMQswCQYDVQQGEwJV
+  UzELMAkGA1UECBMCU0MxFjAUBgNVBAoTDVRob21hcyBDYW5ub24wHhcNMTQwNzA2
+  MjAwNzIwWhcNMTUwNzA2MjAwNzIwWjAyMQswCQYDVQQGEwJVUzELMAkGA1UECBMC
+  U0MxFjAUBgNVBAoTDVRob21hcyBDYW5ub24wggEiMA0GCSqGSIb3DQEBAQUAA4IB
+  DwAwggEKAoIBAQDpj4HA4NiFzaICD5461vznhFv1knDBiihfFJttb+d58MPY+vTv
+  gS4m2ZPadjw8ifCaVozq3m5kJ2qVLGARsvBEP1EY63NFSznQ0KxTFrJqVxyUtpUT
+  7wXjbKRY4AkOvsynH7rCN6d9xLIWlty8yuyopjpBtzpyQr9bDbZ2sPNzcgFEDdOj
+  jXoBhXYsTftLhAWziut3OMuJdI892PgfgwDGGl7qv+TG8xTFo/TrUxKwBtUjbWEH
+  1NylHpOVtYiT56oo/3XWtQOp313tVC212vdHca4PYkm5YOsHAtdfsN+tAssJGjI4
+  Vmmo2MXxB+qq4XjUxuSd3eFlnu8yJdEwbW31AgMBAAEwDQYJKoZIhvcNAQEFBQAD
+  ggEBAG4ZWnnOHwKNcRghmIGrP37aYhCCsRnum3t6GAH9o8m90t7l/JZTUMOlqP/1
+  ARuId0SRsXsHdqxSCyGJ5c6cY1LLj93dVjdoXnLP1EO7/UGUA7bV/AlJWvLHCmCF
+  AEjZy6GkIBCiSKgMvX8n+1BzU8WgzSgy9HYgFYyH9BHxFDLsIaKn+dinLGHNhc4k
+  f1TAAPd+91xFDH8jBhKqlLUvhMQOfMxDVU7rUbFgvdBodjm4BOGUP6gXXDGGqzDK
+  uk8FijDioLmLkvctr2OUkADHYQu9VdTz7YUVp+Y+Sm7bUljfMDdKYKoZdRIu1xVz
+  9GBqvmbrfXAwz0lRXxf/xStjKaE=
+  -----END CERTIFICATE-----

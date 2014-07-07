@@ -1,0 +1,26 @@
+- name: Install SSL key
+  sudo: yes
+  copy: >
+    content="{{ railsapp_ssl_private_key }}"
+    dest=/etc/nginx/{{app_name}}.key
+    owner=www-data group=www-data
+    mode=0400
+
+- name: Install SSL certificate
+  sudo: yes
+  copy: >
+    content="{{ railsapp_ssl_certificate }}"
+    dest=/etc/nginx/{{app_name}}.crt
+    owner=www-data group=www-data
+    mode=0400
+
+- name: Create nginx partial
+  template: "src=_{{ app_name }}_server_common.conf dest=/etc/nginx/configurations/partials/_{{ app_name }}_server_common.conf"
+  sudo: yes
+
+- name: Configure nginx
+  template: src={{ item }} dest=/etc/nginx/configurations/{{ item }}
+  sudo: yes
+  with_items:
+    - "{{ app_name }}.conf"
+  notify: restart nginx

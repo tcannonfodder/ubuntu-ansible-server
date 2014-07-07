@@ -23,7 +23,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     machine.vm.box_url = "http://files.vagrantup.com/precise64.box"
     machine.vm.network :public_network
     machine.vm.network :forwarded_port, guest: 80, host: 8080
-    machine.hostmanager.aliases = %w(staticsite.dev)
+    machine.vm.network :forwarded_port, guest: 443, host: 8443
+    machine.hostmanager.aliases = %w(staticsite.dev railsapp.dev)
   end
 
   config.vm.provision "ansible" do |ansible|

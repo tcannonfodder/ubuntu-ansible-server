@@ -30,3 +30,9 @@
   with_items:
     - "/etc/nginx/configurations"
   sudo: yes
+
+- name: Add directory for configuration partials
+  file: group=vagrant owner=vagrant mode=0755 state=directory path={{ item }}
+  with_items:
+    - "/etc/nginx/configurations/partials"
+  sudo: yes
