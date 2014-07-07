@@ -9,3 +9,5 @@ github_public_key_location: '~/.ssh/id_rsa.pub'
 # logentries_account_key: 
 # newrelic_license_key: 
 # newrelic_server_monitoring: true
+# s3_backup_id: 
+# s3_backup_secret: 
