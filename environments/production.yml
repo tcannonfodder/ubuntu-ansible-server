@@ -11,6 +11,8 @@ memcached:
 postgresql_railsapp_owner_password: test1234
 postgresql_railsapp_app_password: abcd1234
 railsapp_encryption_password: 1234s
+railsapp_secret_key_base: 8c71d33f21528245eb5490efcc8b231ad39ba3ee7d78849672301bc00b871ff7dafe54e46a817a4104d97fc5430cf242885afc7dbcdf13364e2dc0bade3c27e2
+
 ######################################################################
 # SSL
 # For development, this is a self-signed certificate for railsapp.dev
