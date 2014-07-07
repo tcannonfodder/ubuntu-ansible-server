@@ -7,7 +7,7 @@
 - name: Checkout Master from github
   connection: ssh
   git:
-    repo: git@github.com:LockeCole117/test-site.git
+    repo: "{{ staticsite_git_repo_url }}"
     dest: "{{ staticsite_deploy_path }}"
     ssh_opts: -vT
   sudo: no

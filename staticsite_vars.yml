@@ -1,3 +1,4 @@
+staticsite_git_repo_url: "git@github.com:LockeCole117/test-site.git"
 staticsite_shared_path: /u/staticsite
 staticsite_deploy_path: "{{ staticsite_shared_path }}/content"
 staticsite_logs_path: "{{ staticsite_shared_path }}/logs"
