@@ -1,0 +1,58 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:          {{ name }}
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts the {{ name }}
+# Description:       starts {{ name }} rake task in current production directory using start-stop-daemon
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON="/usr/local/bin/bundle"
+DAEMON_OPTS="exec rake -f Rakefile resque:work"
+DAEMON_DIR="{{ app_path }}"
+NAME={{ name }}
+DESC="{{ name }}"
+PIDFILE=/var/run/$NAME.pid
+STARTOPTS="--chuid {{ user_name }} --background --make-pidfile"
+
+export RAILS_ENV=production
+export NEWRELIC_DISPATCHER=resque
+export QUEUES={{ queues }}
+export INTERVAL={{ interval|default(1) }}
+
+test -x $DAEMON || exit 0
+
+set -e
+
+case "$1" in
+  start)
+        echo -n "Starting $DESC: "
+        start-stop-daemon --start --quiet --chdir $DAEMON_DIR --pidfile $PIDFILE \
+                --exec $DAEMON $STARTOPTS -- $DAEMON_OPTS || true
+        echo "$NAME."
+        ;;
+  stop)
+        echo -n "Stopping $DESC: "
+        start-stop-daemon --stop --chdir $DAEMON_DIR --pidfile $PIDFILE || true
+        echo "$NAME."
+        ;;
+  restart|force-reload)
+        echo -n "Restarting $DESC: "
+        start-stop-daemon --stop --chdir $DAEMON_DIR --pidfile $PIDFILE || true
+        sleep 1
+        start-stop-daemon --start --quiet --chdir $DAEMON_DIR --pidfile \
+                $PIDFILE --exec $DAEMON $STARTOPTS -- $DAEMON_OPTS || true
+        echo "$NAME."
+        ;;
+  *)
+        N=/etc/init.d/$NAME
+        echo "Usage: $N {start|stop|restart|reload|force-reload}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0
+

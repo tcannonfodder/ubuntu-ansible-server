@@ -1,0 +1,7 @@
+- name: "Install Resque service: {{ name }}"
+  sudo: yes
+  template: >
+    src=resque.j2
+    dest=/etc/init.d/{{ name }}
+    mode=755
+  notify: restart {{ name }}
