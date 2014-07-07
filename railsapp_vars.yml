@@ -1,8 +1,13 @@
 app_name: railsapp
 unicorn_user: "unicorn-{{ app_name }}"
+railsapp_force_release: false
+railsapp_git_repo_url: "git@github.com:LockeCole117/test-app.git"
+railsapp_git_tree_url: https://github.com/LockeCole117/test-app/tree
+railsapp_git_branch: master
 railsapp_path: "/u/{{ app_name }}"
 railsapp_shared_path: "{{ railsapp_path }}/shared"
 railsapp_releases_path: "{{ railsapp_path }}/releases"
 railsapp_scripts_path: "{{ railsapp_path }}/scripts"
 railsapp_log_path: "{{ railsapp_shared_path }}/log"
 railsapp_backup_path: "{{ railsapp_shared_path }}/backups"
+railsapp_current_path: "{{ railsapp_path }}/current"
