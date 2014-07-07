@@ -25,7 +25,7 @@ begin
   db_name = 'railsapp'
   backups_path = "{{ railsapp_backup_path }}"
   db_password = ENV['postgresql_railsapp_owner_password']
-  password = ENV['backup_password']
+  password = ENV['railsapp_encryption_password']
   time = Time.now.strftime("%Y-%m-%d-%H%M")
   filename = "#{backups_path}/#{`hostname`.strip}-#{time}.dump"
 

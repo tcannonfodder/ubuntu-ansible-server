@@ -10,3 +10,4 @@ memcached:
 
 postgresql_railsapp_owner_password: test1234
 postgresql_railsapp_app_password: abcd1234
+railsapp_encryption_password: 1234s
